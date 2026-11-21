@@ -1,0 +1,152 @@
+"""Sumber tunggal kosakata tertutup (closed vocabularies)."""
+from enum import StrEnum
+
+
+class SourceCategory(StrEnum):
+    OJK = "OJK"
+    BANK_INDONESIA = "BANK_INDONESIA"
+    PERATURAN_JDIH = "PERATURAN_JDIH"
+    PPATK = "PPATK"
+    KEMENKEU = "KEMENKEU"
+    KOMDIGI = "KOMDIGI"
+    OTHER = "OTHER"
+
+
+class InstrumentType(StrEnum):
+    POJK = "POJK"
+    PBI = "PBI"
+    PP = "PP"
+    PERPRES = "PERPRES"
+    UU = "UU"
+    PO = "PO"
+    
+INSTRUMENT_PRESETS = {
+    "OJK": {
+        "issuer": "Otoritas Jasa Keuangan",
+        "source_category": "OJK",
+        "base_url": "https://www.ojk.go.id",
+    },
+    "BI": {
+        "issuer": "Bank Indonesia",
+        "source_category": "BANK_INDONESIA",
+        "base_url": "https://www.bi.go.id",
+    },
+    "PEMERINTAH": {
+        "issuer": "Pemerintah Republik Indonesia",
+        "source_category": "PERATURAN_JDIH",
+        "base_url": "https://peraturan.go.id",
+    },
+    "PPATK": {
+        "issuer": "Pusat Pelaporan dan Analisis Transaksi Keuangan",
+        "source_category": "PPATK",
+        "base_url": "https://www.ppatk.go.id",
+    },
+    "KEMENKEU": {
+        "issuer": "Kementerian Keuangan",
+        "source_category": "KEMENKEU",
+        "base_url": "https://jdih.kemenkeu.go.id",
+    },
+    "KOMDIGI": {
+        "issuer": "Kementerian Komunikasi dan Digital",
+        "source_category": "KOMDIGI",
+        "base_url": "https://jdih.komdigi.go.id",
+    },
+}
+
+
+class DocumentStatus(StrEnum):
+    DRAFT = "DRAFT"; IN_FORCE = "IN_FORCE"; NOT_YET_IN_FORCE = "NOT_YET_IN_FORCE"
+    AMENDED = "AMENDED"; PARTIALLY_REVOKED = "PARTIALLY_REVOKED"; REVOKED = "REVOKED"
+    SUPERSEDED = "SUPERSEDED"; UNKNOWN = "UNKNOWN"
+
+
+class VersionState(StrEnum):
+    PARSING = "PARSING"; SEGMENTED_DRAFT = "SEGMENTED_DRAFT"
+    UNDER_CORRECTION = "UNDER_CORRECTION"; PUBLISHED = "PUBLISHED"; WITHDRAWN = "WITHDRAWN"
+
+
+class ProvisionType(StrEnum):
+    BAB = "BAB"; BAGIAN = "BAGIAN"; PASAL = "PASAL"; AYAT = "AYAT"; HURUF = "HURUF"
+    PENJELASAN = "PENJELASAN"  # penjelasan resmi atas satu pasal (bagian "PASAL DEMI PASAL")
+    ANGKA = "ANGKA"  # butir bernomor di dalam bagian Surat Edaran
+
+
+class ChangeType(StrEnum):
+    PROVISION_ADDED = "PROVISION_ADDED"; PROVISION_DELETED = "PROVISION_DELETED"
+    TEXT_MODIFIED = "TEXT_MODIFIED"
+
+
+class ApplicabilityValue(StrEnum):
+    APPLICABLE = "APPLICABLE"; PARTIALLY_APPLICABLE = "PARTIALLY_APPLICABLE"
+    NOT_APPLICABLE = "NOT_APPLICABLE"; REQUIRES_FURTHER_REVIEW = "REQUIRES_FURTHER_REVIEW"
+
+
+class ObligationState(StrEnum):
+    AI_DRAFT = "AI_DRAFT"; IN_VALIDATION = "IN_VALIDATION"; PENDING_APPROVAL = "PENDING_APPROVAL"
+    PENDING_LEGAL = "PENDING_LEGAL"  # FRD Eksibit 33: dieskalasi ke Peninjau Hukum
+    ACTIVE = "ACTIVE"; REVIEW_REQUIRED = "REVIEW_REQUIRED"; SUPERSEDED = "SUPERSEDED"; RETIRED = "RETIRED"
+
+class ControlResult(StrEnum):
+    EFFECTIVE = "EFFECTIVE"; PARTIALLY_EFFECTIVE = "PARTIALLY_EFFECTIVE"; INEFFECTIVE = "INEFFECTIVE"
+
+
+class AppRole(StrEnum):
+    REGULATORY_ANALYST = "REGULATORY_ANALYST"
+    COMPLIANCE_OFFICER = "COMPLIANCE_OFFICER"
+    BUSINESS_CONTROL_OWNER = "BUSINESS_CONTROL_OWNER"
+    LEGAL_REVIEWER = "LEGAL_REVIEWER"
+    COMPLIANCE_MANAGER = "COMPLIANCE_MANAGER"
+    INTERNAL_AUDITOR = "INTERNAL_AUDITOR"
+    EXECUTIVE = "EXECUTIVE"
+    SYSTEM_ADMINISTRATOR = "SYSTEM_ADMINISTRATOR"
+
+
+class Severity(StrEnum):
+    CRITICAL = "CRITICAL"; HIGH = "HIGH"; MEDIUM = "MEDIUM"; LOW = "LOW"
+
+
+class FindingState(StrEnum):
+    OPEN = "OPEN"; ACTION_PLANNED = "ACTION_PLANNED"; IN_REMEDIATION = "IN_REMEDIATION"
+    PENDING_CLOSURE_VALIDATION = "PENDING_CLOSURE_VALIDATION"; CLOSED = "CLOSED"
+    RISK_ACCEPTED = "RISK_ACCEPTED"; REVIEW_REQUIRED = "REVIEW_REQUIRED"
+
+
+class FindingSource(StrEnum):
+    ASSESSMENT = "ASSESSMENT"; EVIDENCE_GAP = "EVIDENCE_GAP"; COVERAGE_GAP = "COVERAGE_GAP"; MANUAL = "MANUAL"
+
+
+class ActionState(StrEnum):
+    OPEN = "OPEN"; IN_PROGRESS = "IN_PROGRESS"; DONE = "DONE"; CANCELLED = "CANCELLED"
+
+
+class EvidenceState(StrEnum):
+    SUBMITTED = "SUBMITTED"; ACCEPTED = "ACCEPTED"; REJECTED = "REJECTED"
+    SUPERSEDED = "SUPERSEDED"; EXPIRED = "EXPIRED"
+
+
+class AssessmentState(StrEnum):
+    CONCLUDED = "CONCLUDED"; PENDING_SIGNOFF = "PENDING_SIGNOFF"; SIGNED_OFF = "SIGNED_OFF"
+
+
+class DesignResult(StrEnum):
+    EFFECTIVE = "EFFECTIVE"; PARTIALLY_EFFECTIVE = "PARTIALLY_EFFECTIVE"; INEFFECTIVE = "INEFFECTIVE"
+    NOT_ASSESSED = "NOT_ASSESSED"
+
+
+class OperatingResult(StrEnum):
+    EFFECTIVE = "EFFECTIVE"; PARTIALLY_EFFECTIVE = "PARTIALLY_EFFECTIVE"; INEFFECTIVE = "INEFFECTIVE"
+    NOT_TESTED = "NOT_TESTED"; NOT_APPLICABLE = "NOT_APPLICABLE"
+
+
+class ReportState(StrEnum):
+    DRAFT = "DRAFT"; PENDING_APPROVAL = "PENDING_APPROVAL"; ISSUED = "ISSUED"
+    SUPERSEDED = "SUPERSEDED"; WITHDRAWN = "WITHDRAWN"
+
+
+# Titik kendali maker-checker (FRD §5.10, EKSIBIT 38)
+class ControlPoint:
+    MATERIALITY = 1; APPLICABILITY = 2; OBLIGATION = 3; ASSESSMENT_SIGNOFF = 4; FINDING_CLOSURE = 5; REPORT_ISSUE = 6
+
+
+# Jendela remediasi maksimum per severity (TRD EKSIBIT 37; MEDIUM/LOW = asumsi tim, dapat disetel)
+REMEDIATION_WINDOW_DAYS = {"CRITICAL": 30, "HIGH": 60, "MEDIUM": 90, "LOW": 180}
