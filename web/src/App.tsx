@@ -21,6 +21,7 @@ import { Cari } from "./pages/Cari";
 import { Keberlakuan } from "./pages/Keberlakuan";
 import { Admin } from "./pages/Admin";
 import { Sumber } from "./pages/Sumber";  // [A19] halaman registri sumber regulasi
+import { Auditor } from "./pages/Auditor";
 
 
 type Item = { route: string; label: string; desc: string; only?: Role[] };
@@ -40,6 +41,7 @@ const MENU: { label: string; items: Item[] }[] = [
   { label: "Temuan & Remediasi", items: [{ route: "temuan", label: "Register temuan", desc: "Tindakan, bukti penutupan, validasi" }] },
   { label: "Laporan & Audit", items: [
     { route: "laporan", label: "Laporan kepatuhan", desc: "Draf, persetujuan, dan penerbitan" },
+    { route: "auditor", label: "Ruang auditor", desc: "Ketertelusuran, bukti, kelengkapan jejak audit", only: ["INTERNAL_AUDITOR"] },
     { route: "audit", label: "Jejak audit", desc: "Siapa melakukan apa, kapan" },
     { route: "admin", label: "Administrasi", desc: "Parameter runtime, pengguna, metrik" }] },
 ];
@@ -117,6 +119,7 @@ export default function App() {
       {canSeePage(me.role, page) && page === "temuan" && <Temuan ctx={ctx} selected={param} />}
       {canSeePage(me.role, page) && page === "laporan" && <Laporan ctx={ctx} selected={param} />}
       {canSeePage(me.role, page) && page === "audit" && <Audit ctx={ctx} />}
+      {canSeePage(me.role, page) && page === "auditor" && <Auditor ctx={ctx} />}
       {canSeePage(me.role, page) && page === "copilot" && <Copilot ctx={ctx} />}
       {canSeePage(me.role, page) && page === "cari" && <Cari ctx={ctx} kind={decodeURIComponent(param || "Semua")} q={decodeURIComponent(route.split("/").slice(2).join("/"))} />}
     </main>

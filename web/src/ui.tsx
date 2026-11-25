@@ -105,6 +105,7 @@ const PAGE_READ: Record<string, [string, string][]> = {
   audit: [["audit_trail", "R"]], admin: [["system_config", "R"], ["user_admin", "R"]],
   sumber: [["source_registry", "R"]],  // [A19] halaman Sumber regulasi
   "kontrol-saya": [["control_library", "R"]],
+  auditor: [["audit_trail", "R"]],
 };
 /** [A18] log interaksi copilot: Promosi keluaran copilot (R) atau Jejak audit (R) — sama dengan server */
 export const canReadCopilotLog = (role: Role) => canDo(role, "copilot_promote", "R") || canDo(role, "audit_trail", "R");
@@ -193,3 +194,5 @@ export function Highlight({ text }: { text: string }) {
   return <>{text.split(/(\[\[[\s\S]*?\]\])/g).map((p, i) =>
     p.startsWith("[[") && p.endsWith("]]") ? <mark key={i}>{p.slice(2, -2)}</mark> : <span key={i}>{p}</span>)}</>;
 }
+
+

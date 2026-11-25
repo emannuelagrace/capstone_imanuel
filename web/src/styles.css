@@ -311,3 +311,4 @@ button.kpi:focus-visible { outline: 2px solid var(--seal); }
 .change-card .verbatim { margin-top: 12px; }
 .change-title { font-family: var(--serif); font-size: 18px; }
 @media (max-width: 760px) { .compare-bar { grid-template-columns: 1fr 1fr; } .compare-bar .field:first-child { grid-column: 1 / -1; } }
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
