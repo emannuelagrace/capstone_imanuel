@@ -59,3 +59,35 @@ def test_owner_saves_plan_within_window(client, H):
     ok = client.post(f"{P}/compliance/owner/findings/{fid}/plan", headers=H["owner"],
                      json={"description": "Pasang pengingat otomatis", "due_date": D(20)})
     assert ok.status_code == 200 and ok.json()["data"]["finding_state"] == "ACTION_PLANNED"
+    
+    
+def test_executive_posture_extended_fields(client, H):
+    d = client.get(f"{P}/compliance/executive/posture", headers=H["executive"]).json()["data"]
+    assert set(d["severity"]) >= {"CRITICAL", "HIGH", "MEDIUM", "LOW"}
+    assert set(d["coverage"]) >= {"gaps", "partial"}
+    assert set(d["changes"]) >= {"pending_review", "over_sla"}
+    for g in d["material_gaps"]:
+        assert g["provision_version_id"]  # gap harus dapat ditelusuri ke pasal
+
+
+def test_executive_trend_shape(client, H):
+    r = client.get(f"{P}/compliance/executive/trend?months=6", headers=H["executive"])
+    assert r.status_code == 200, r.text
+    months = r.json()["data"]["months"]
+    assert len(months) == 6
+    assert all(set(m) >= {"month", "findings_opened", "assessments_signed", "assessments_effective"} for m in months)
+
+
+@pytest.mark.parametrize("who", ["officer", "manager", "owner", "auditor"])
+def test_executive_trend_is_executive_only(client, H, who):
+    assert client.get(f"{P}/compliance/executive/trend", headers=H[who]).status_code == 403
+
+
+def test_owner_workspace_summary_and_evidence_items(client, H):
+    _finding_owned_by_owner(client, H)
+    d = client.get(f"{P}/compliance/owner/workspace", headers=H["owner"]).json()["data"]
+    s = d["summary"]
+    assert s["open_findings"] == len(d["findings"])
+    assert s["needs_plan"] >= 1
+    assert s["controls"] == len(d["controls"])
+    assert all("evidence_items" in c for c in d["controls"])

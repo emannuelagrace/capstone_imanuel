@@ -27,12 +27,13 @@ import { Auditor } from "./pages/Auditor";
 type Item = { route: string; label: string; desc: string; only?: Role[] };
 const MENU: { label: string; items: Item[] }[] = [
   { label: "Beranda", items: [{ route: "beranda", label: "Beranda", desc: "Postur kepatuhan", only: ["EXECUTIVE"] }] },
-  { label: "Kontrol saya", items: [{ route: "kontrol-saya", label: "Kontrol saya", desc: "Bukti & temuan milik Anda", only: ["BUSINESS_CONTROL_OWNER"]},
+    { label: "Kontrol saya", items: [{ route: "kontrol-saya", label: "Kontrol saya", desc: "Bukti & temuan milik Anda", only: ["BUSINESS_CONTROL_OWNER"] }] },
+  { label: "Regulasi", items: [
     { route: "regulasi", label: "Korpus & pasal", desc: "Dokumen, versi imutabel, dan teks pasal" },
     { route: "katalog", label: "Katalog peraturan", desc: "Telusuri seluruh peraturan" },
-    { route: "sumber", label: "Sumber regulasi", desc: "Registri sumber & persetujuan penggunaan" },  // [A19]
-    { route: "perubahan", label: "Perubahan regulasi", desc: "Bandingkan versi, deteksi perubahan material" },
-    { route: "copilot", label: "Tanya regulasi", desc: "Jawaban bersitasi + antrean tinjauan" }] },
+    { route: "sumber", label: "Sumber regulasi", desc: "Registri sumber & persetujuan penggunaan" },
+    { route: "perubahan", label: "Perubahan regulasi", desc: "Bandingkan versi, deteksi perubahan material" }] },
+  { label: "Tanya regulasi", items: [{ route: "copilot", label: "Tanya regulasi", desc: "Jawaban bersitasi + antrean tinjauan" }] },
   { label: "Kepatuhan", items: [
     { route: "keberlakuan", label: "Keberlakuan", desc: "Apakah peraturan mengikat organisasi" },
     { route: "kewajiban", label: "Kewajiban", desc: "Draf AI, validasi, dan persetujuan" },

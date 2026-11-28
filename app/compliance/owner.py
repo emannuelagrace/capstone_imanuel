@@ -3,7 +3,7 @@
 CATATAN RBAC: matriks memberi Pemilik 'RUX (own)' pada remediasi (tanpa C). Endpoint /plan membuat satu
 tindakan milik Pemilik sendiri, jadi secara fungsi ini 'C (own)'. Sepakati dengan tim.
 """
-from datetime import date
+from datetime import date, timedelta
 from typing import Optional
 
 from fastapi import APIRouter, Depends
@@ -11,9 +11,9 @@ from pydantic import BaseModel
 from sqlalchemy import or_, select, text
 from sqlalchemy.orm import Session
 
-from app.compliance.common import get_or_404, require_text, user_names
+from app.compliance.common import get_or_404, iso, require_text, today, user_names
 from app.compliance.findings import TERMINAL, _set_state, finding_dto, validate_due_date
-from app.compliance.models import Control, Finding, RemediationAction
+from app.compliance.models import Control, Evidence, Finding, RemediationAction
 from app.platform.governance import audit
 from app.platform.models import AppUser
 from app.platform.permissions import require
@@ -26,6 +26,8 @@ router = APIRouter(prefix="/api/v1/compliance/owner", tags=["owner"])
 R = V.AppRole
 MINE = require("control_library", "R", only=[R.BUSINESS_CONTROL_OWNER])
 PLAN = require("remediation", "U", only=[R.BUSINESS_CONTROL_OWNER])
+
+DUE_SOON_DAYS = 7
 
 
 class PlanIn(BaseModel):
@@ -66,10 +68,16 @@ def workspace(db: Session = Depends(get_db), user: AppUser = Depends(MINE)):
             JOIN corpus.document d ON d.id = dv.document_id
             WHERE m.control_id = :c AND o.state IN ('ACTIVE','REVIEW_REQUIRED')
             ORDER BY d.canonical_number, p.number_label"""), {"c": c.id}).all()]
+        # riwayat bukti terbaru: pemilik melihat status tiap bukti dan alasan penolakan, bukan hanya hitungan
+        evidence_items = [{"id": str(e.id), "filename": e.filename, "description": e.description, "state": e.state,
+                           "uploaded_at": iso(e.uploaded_at), "review_rationale": e.review_rationale}
+                          for e in db.scalars(select(Evidence).where(Evidence.control_id == c.id)
+                                              .order_by(Evidence.uploaded_at.desc()).limit(5))]
         controls.append({
             "id": str(c.id), "title": c.title, "source_changed": c.source_changed, "obligations": obligations,
             "evidence": {"total": sum(by_state.values()), "accepted": by_state.get("ACCEPTED", 0),
                          "pending": by_state.get("SUBMITTED", 0), "rejected": by_state.get("REJECTED", 0)},
+            "evidence_items": evidence_items,
             "status": _evidence_status(by_state, signed.operating_result if signed else None),
             "signed_off_at": signed.signed_off_at if signed else None,
         })
@@ -87,7 +95,22 @@ def workspace(db: Session = Depends(get_db), user: AppUser = Depends(MINE)):
         d["needs_plan"] = (str(f.owner_id) == str(user.id) and not live
                            and f.state != V.FindingState.PENDING_CLOSURE_VALIDATION.value)
         findings.append(d)
-    return ResponseWrapper(data={"controls": controls, "findings": findings})
+
+    # ringkasan untuk banner "perlu perhatian" (eskalasi/overdue terlihat tanpa membuka tiap kartu)
+    me, soon_limit = str(user.id), today() + timedelta(days=DUE_SOON_DAYS)
+    mine = [a for f in findings for a in f["actions"]
+            if a["state"] in ("OPEN", "IN_PROGRESS") and a.get("owner_id") == me]
+    summary = {
+        "controls": len(controls),
+        "needs_evidence": sum(1 for c in controls if c["status"] == "NEEDS_EVIDENCE" or c["source_changed"]),
+        "pending_review": sum(1 for c in controls if c["status"] == "PENDING_REVIEW"),
+        "open_findings": len(findings),
+        "needs_plan": sum(1 for f in findings if f["needs_plan"]),
+        "overdue_actions": sum(1 for a in mine if a["overdue"]),
+        "due_soon_actions": sum(1 for a in mine if not a["overdue"] and date.fromisoformat(a["due_date"]) <= soon_limit),
+        "due_soon_days": DUE_SOON_DAYS,
+    }
+    return ResponseWrapper(data={"summary": summary, "controls": controls, "findings": findings})
 
 
 @router.post("/findings/{fid}/plan", response_model=ResponseWrapper[dict])

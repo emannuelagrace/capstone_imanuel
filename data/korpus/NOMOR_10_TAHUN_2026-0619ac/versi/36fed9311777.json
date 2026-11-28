@@ -44,10 +44,10 @@
       "text": "(1)\nUnit Karbon merupakan Efek.\n(2)\nUnit Karbon yang ditransaksikan di Bursa Karbon\nwajib terlebih dahulu dicatatkan pada:\na.\nSRUK; dan\nb.\nPenyelenggara Bursa Karbon.\n(3)\nPenyelenggara\nBursa\nKarbon\ndapat\nmemfasilitasi\nperdagangan:\na.\nUnit Karbon yang tercatat di SRUK; dan/atau\nb.\nunit karbon dari luar negeri yang tidak tercatat\n\n\ndi SRUK, sepanjang tidak bertentangan dengan\nketentuan peraturan perundang-undangan.\n(4)\nUnit karbon dari luar negeri yang tidak tercatat pada\nSRUK sebagaimana dimaksud pada ayat (3) huruf b\nharus memenuhi persyaratan:\na.\ntelah terdaftar, divalidasi, dan diverifikasi oleh\nlembaga\nyang\nmemperoleh\nakreditasi\ndari\npenyelenggara\nsistem\nregistrasi\ninternasional\ndan/atau telah tercatat pada Bursa Karbon luar\nnegeri, dan\nb.\npersyaratan lain yang ditetapkan oleh Otoritas\nJasa Keuangan.\n(5)\nDalam\nmemperdagangkan\nunit\nkarbon\ndari\nluar\nnegeri yang tidak tercatat pada SRUK sebagaimana\ndimaksud pada ayat (3), Penyelenggara Bursa Karbon\nwajib memastikan integritas, kualitas, dan standar\npencatatan unit karbon.\n(6)\nOtoritas Jasa Keuangan menetapkan persyaratan lain\nsebagaimana dimaksud pada ayat (4) huruf b setelah\nberkoordinasi\ndengan\nmenteri\nyang\nmenyelenggarakan urusan pemerintahan di bidang\npelindungan dan pengelolaan lingkungan hidup.\n3.\nKetentuan\nPasal 5 diubah\nsehingga berbunyi sebagai\nberikut:"
     },
     {
-      "corrected_by_human": false,
+      "corrected_by_human": true,
       "hierarchical_path": "Pasal 5",
       "id": "6727e568-23aa-4ab3-b3d9-4b9dc4f9753e",
-      "low_confidence_text": true,
+      "low_confidence_text": false,
       "number_label": "Pasal 5",
       "provision_key": "PASAL-5",
       "provision_type": "PASAL",
@@ -56,10 +56,10 @@
       "text": "Unit Karbon yang diperdagangkan di Penyelenggara Bursa\nKarbon terdiri atas:\na.\nKuota Emisi GRK,\nb.\nSPE GRK, dan\nc.\n non-SPE GRK.\n4.\nDi antara Pasal 12 dan Pasal 13 disisipkan 1 (satu) pasal,\nyakni pasal 12A sehingga berbunyi sebagai berikut:"
     },
     {
-      "corrected_by_human": false,
+      "corrected_by_human": true,
       "hierarchical_path": "Pasal 12A",
       "id": "131087bb-12a8-413c-ae75-f10f0f691dcd",
-      "low_confidence_text": true,
+      "low_confidence_text": false,
       "number_label": "Pasal 12A",
       "provision_key": "PASAL-12A",
       "provision_type": "PASAL",
@@ -239,5 +239,5 @@
   "sha256": "36fed93117778eeaa5a35a5b0055dd3d06f5a15968f92ac69fd8d98a54c475f7",
   "state": "UNDER_CORRECTION",
   "storage_key": "NOMOR_10_TAHUN_2026/1bac016b095f487fa1c28d20b784b68e.pdf",
-  "updated_at": "2026-11-04T10:38:19.480671+00:00"
+  "updated_at": "2026-11-28T07:12:39.058865+00:00"
 }

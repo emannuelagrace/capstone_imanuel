@@ -1,4 +1,4 @@
-"""Tampilan Eksekutif (Direksi, hanya baca): ringkasan postur kepatuhan."""
+"""Tampilan Eksekutif (Direksi, hanya baca): ringkasan postur kepatuhan, gap material, tenggat, dan tren."""
 from fastapi import APIRouter, Depends
 from sqlalchemy import text
 from sqlalchemy.orm import Session
@@ -66,6 +66,21 @@ def posture(db: Session = Depends(get_db), user: AppUser = Depends(EXEC_READ)):
         WHERE dv.state = 'PUBLISHED'
         ORDER BY dv.effective_date DESC, d.canonical_number LIMIT 5""")).all()]
 
+    # Gap material: kewajiban ACTIVE yang belum punya kontrol. Sertakan provision_version_id agar angka dapat
+    # ditelusuri ke pasal sumbernya (PDF: "Auditor menelusuri sampai pasal asal", "Meninjau material gap").
+    gap_ids = m["drill"]["gaps"]
+    material_gaps = [dict(r._mapping) for r in db.execute(text("""
+        SELECT o.id::text AS obligation_id, o.plain_language_summary AS summary, u.username AS owner,
+               d.canonical_number, p.number_label, pv.id::text AS provision_version_id,
+               (current_date - o.created_at::date) AS age_days
+        FROM compliance.obligation o
+        JOIN corpus.provision_version pv ON pv.id = o.primary_citation_id
+        JOIN corpus.provision p ON p.id = pv.provision_id
+        JOIN corpus.document_version dv ON dv.id = pv.document_version_id
+        JOIN corpus.document d ON d.id = dv.document_id
+        LEFT JOIN platform.app_user u ON u.id = o.owner_id
+        WHERE o.id = ANY(CAST(:ids AS uuid[])) ORDER BY o.created_at LIMIT 10"""), {"ids": gap_ids}).all()]
+
     return ResponseWrapper(data={
         "as_at": m["as_at"],
         "kpis": {
@@ -78,4 +93,35 @@ def posture(db: Session = Depends(get_db), user: AppUser = Depends(EXEC_READ)):
         "basis": m["compliance_score"]["basis"],
         "by_area": by_area,
         "new_regulations": new_regs,
+        # --- tambahan ---
+        "severity": m["findings_by_severity"],
+        "coverage": {"gaps": m["gaps"], "partial": m["partial_coverage"], "controls_without_owner": m["controls_without_owner"],
+                     "excluded_ai_draft": m["excluded_ai_draft"]},
+        "material_gaps": material_gaps,
+        "deadlines": m["upcoming_deadlines"][:8],
+        "overdue_actions": m["overdue_actions"],
+        "changes": {"pending_review": m["changes_pending_review"], "over_sla": m["changes_over_sla"],
+                    "sla_days": m["change_review_sla_days"]},
     })
+
+
+@router.get("/trend", response_model=ResponseWrapper[dict])
+def trend(months: int = 6, db: Session = Depends(get_db), user: AppUser = Depends(EXEC_READ)):
+    """Tren bulanan dari data transaksi (bukan snapshot skor historis): temuan baru, asesmen sign-off, dan
+    asesmen sign-off berhasil EFFECTIVE. Cukup untuk 'tren' pada MVP tanpa tabel snapshot baru."""
+    n = max(2, min(int(months), 24))
+    rows = db.execute(text("""
+        WITH mm AS (
+          SELECT generate_series(date_trunc('month', current_date) - make_interval(months => :n - 1),
+                                 date_trunc('month', current_date), interval '1 month')::date AS m)
+        SELECT to_char(mm.m, 'YYYY-MM') AS month,
+               (SELECT count(*) FROM compliance.finding f
+                 WHERE date_trunc('month', f.created_at)::date = mm.m) AS findings_opened,
+               (SELECT count(*) FROM compliance.assessment a
+                 WHERE a.state = 'SIGNED_OFF' AND date_trunc('month', a.signed_off_at)::date = mm.m) AS assessments_signed,
+               (SELECT count(*) FROM compliance.assessment a
+                 WHERE a.state = 'SIGNED_OFF' AND a.operating_result = 'EFFECTIVE'
+                   AND date_trunc('month', a.signed_off_at)::date = mm.m) AS assessments_effective
+        FROM mm ORDER BY mm.m"""), {"n": n}).all()
+    return ResponseWrapper(data={"months": [dict(r._mapping) for r in rows],
+                                 "note": "Tren aktivitas bulanan; bukan skor kepatuhan historis."})

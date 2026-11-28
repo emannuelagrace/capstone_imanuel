@@ -113,8 +113,8 @@ export const canReadCopilotLog = (role: Role) => canDo(role, "copilot_promote", 
 const ONLY_ROLE: Record<string, Role[]> = { "kontrol-saya": ["BUSINESS_CONTROL_OWNER"] };
 /** Peran dengan layar khusus (sesuai mockup): hanya rute ini yang bisa dibuka. Hanya penataan UI; server tetap menegakkan RBAC. */
 const ROLE_ROUTES: Partial<Record<Role, string[]>> = {
-  EXECUTIVE: ["beranda", "laporan", "cari", "peraturan"],
-  BUSINESS_CONTROL_OWNER: ["kontrol-saya", "temuan", "cari", "peraturan"],
+  EXECUTIVE: ["beranda", "laporan", "cari", "peraturan", "copilot"],
+  BUSINESS_CONTROL_OWNER: ["kontrol-saya", "temuan", "cari", "peraturan", "copilot"],
 };
 /** Halaman awal setelah login. */
 export const homeRoute = (role: Role): string => (role === "BUSINESS_CONTROL_OWNER" ? "kontrol-saya" : "beranda");
